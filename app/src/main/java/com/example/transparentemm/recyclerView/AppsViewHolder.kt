@@ -1,4 +1,4 @@
-package com.example.transparentemm
+package com.example.transparentemm.recyclerView
 
 import android.net.Uri
 import android.view.View

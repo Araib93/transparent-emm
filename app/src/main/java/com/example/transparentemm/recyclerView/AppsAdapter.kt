@@ -1,8 +1,10 @@
-package com.example.transparentemm
+package com.example.transparentemm.recyclerView
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.transparentemm.App
+import com.example.transparentemm.R
 
 class AppsAdapter(
     private var apps: ArrayList<App> = arrayListOf(),

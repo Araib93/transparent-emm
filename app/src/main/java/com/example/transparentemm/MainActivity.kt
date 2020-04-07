@@ -4,13 +4,15 @@ import android.Manifest
 import android.app.WallpaperManager
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.transparentemm.misc.ApkInfoExtractor
+import com.example.transparentemm.misc.FileUtils
+import com.example.transparentemm.recyclerView.AppsAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,14 +21,6 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     private val REQUEST_READ_STORAGE = 100
-
-    private val flags = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            or View.SYSTEM_UI_FLAG_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
-
     private val appsAdapter by lazy {
         AppsAdapter { app ->
             packageManager.getLaunchIntentForPackage(app.packageName)
@@ -43,16 +37,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Info: Disabled as we will not be needing this
-/*
-        window.addFlags(
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                    or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-                    or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        )
-*/
-
-//        window.decorView.systemUiVisibility = flags
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -68,7 +52,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadApps() {
-        val apkInfoExtractor = ApkInfoExtractor(this)
+        val apkInfoExtractor =
+            ApkInfoExtractor(this)
         val fileUtils = FileUtils(this)
         CoroutineScope(Dispatchers.IO).launch {
             val apps = apkInfoExtractor.getInstalledApps().map {

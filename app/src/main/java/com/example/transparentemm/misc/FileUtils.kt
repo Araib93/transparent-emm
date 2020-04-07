@@ -1,4 +1,4 @@
-package com.example.transparentemm
+package com.example.transparentemm.misc
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -35,13 +35,17 @@ class FileUtils constructor(private val context: Context) {
         return file.delete()
     }
 
-    suspend fun saveBitmap(name: String, bitmap: Bitmap): Uri =
+    suspend fun saveBitmap(name: String, bitmap: Bitmap, forceReload: Boolean = false): Uri =
         withContext(Dispatchers.IO) {
             val file = getFile(name, "jpeg", "app_icons")
-            with(file.outputStream()) {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 90, this)
-                flush()
+            if (!forceReload && file.exists()) {
+                Uri.fromFile(file)
+            } else {
+                with(file.outputStream()) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, this)
+                    flush()
+                }
+                Uri.fromFile(file)
             }
-            Uri.fromFile(file)
         }
 }
