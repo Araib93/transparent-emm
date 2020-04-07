@@ -7,7 +7,7 @@ import com.example.transparentemm.App
 import com.example.transparentemm.R
 
 class AppsAdapter(
-    private var apps: ArrayList<App> = arrayListOf(),
+    private var mApps: ArrayList<App> = arrayListOf(),
     private var onAppClick: (app: App) -> Unit
 ) :
     RecyclerView.Adapter<AppsViewHolder>() {
@@ -18,19 +18,23 @@ class AppsAdapter(
     }
 
     override fun getItemCount(): Int {
-        return apps.size
+        return mApps.size
     }
 
     override fun onBindViewHolder(holder: AppsViewHolder, position: Int) {
-        val app = apps[position]
-        holder.setAppName(app.appName)
-        holder.setAppIcon(app.icon)
-        holder.setOnClickListener { onAppClick(app) }
+        val app = mApps[position]
+        holder.apply {
+            setAppName(app.appName)
+            setAppIcon(app.icon)
+            setOnClickListener { onAppClick(app) }
+        }
     }
 
     fun addApps(apps: List<App>) {
-        this.apps.clear()
-        this.apps.addAll(apps)
+        mApps.apply {
+            clear()
+            addAll(apps)
+        }
         notifyDataSetChanged()
     }
 }
