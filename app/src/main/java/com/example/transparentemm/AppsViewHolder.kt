@@ -13,4 +13,8 @@ class AppsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun setAppName(appName: String) {
         itemView.tv_name.text = appName
     }
+
+    fun setOnClickListener(onAppClick: () -> Unit) {
+        itemView.setOnClickListener { onAppClick.invoke() }
+    }
 }

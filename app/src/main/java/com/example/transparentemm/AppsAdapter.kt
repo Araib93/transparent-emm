@@ -4,7 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-class AppsAdapter(private var apps: ArrayList<App> = arrayListOf()) :
+class AppsAdapter(
+    private var apps: ArrayList<App> = arrayListOf(),
+    private var onAppClick: (app: App) -> Unit
+) :
     RecyclerView.Adapter<AppsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppsViewHolder {
@@ -20,6 +23,7 @@ class AppsAdapter(private var apps: ArrayList<App> = arrayListOf()) :
         val app = apps[position]
         holder.setAppName(app.appName)
         holder.setAppIcon(app.icon)
+        holder.setOnClickListener { onAppClick(app) }
     }
 
     fun addApps(apps: List<App>) {

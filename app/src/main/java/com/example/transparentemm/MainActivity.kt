@@ -5,7 +5,7 @@ import android.app.WallpaperManager
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
-import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -27,7 +27,20 @@ class MainActivity : AppCompatActivity() {
             or View.SYSTEM_UI_FLAG_FULLSCREEN
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 
-    private val appsAdapter by lazy { AppsAdapter() }
+    private val appsAdapter by lazy {
+        AppsAdapter { app ->
+            packageManager.getLaunchIntentForPackage(app.packageName)
+                ?.let { intent ->
+                    startActivity(intent)
+                } ?: run {
+                Toast.makeText(
+                    this,
+                    "${app.packageName} Error, Please Try Again.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Info: Disabled as we will not be needing this
