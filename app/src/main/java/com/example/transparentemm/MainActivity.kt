@@ -9,7 +9,13 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
+import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     private val REQUEST_READ_STORAGE = 100
@@ -21,18 +27,52 @@ class MainActivity : AppCompatActivity() {
             or View.SYSTEM_UI_FLAG_FULLSCREEN
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 
+    private val appsAdapter by lazy { AppsAdapter() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Info: Disabled as we will not be needing this
+/*
         window.addFlags(
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                     or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                     or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
         )
+*/
 
 //        window.decorView.systemUiVisibility = flags
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         checkStoragePermission()?.let { setWallpaper() }
+        showApps()
+    }
+
+    private fun showApps() {
+        rv_apps.adapter = appsAdapter
+        rv_apps.layoutManager = GridLayoutManager(this, 4)
+
+        loadApps()
+    }
+
+    private fun loadApps() {
+        val apkInfoExtractor = ApkInfoExtractor(this)
+        val fileUtils = FileUtils(this)
+        CoroutineScope(Dispatchers.IO).launch {
+            val apps = apkInfoExtractor.getInstalledApps().map {
+                App(
+                    appName = apkInfoExtractor.getAppNameByPackageName(it),
+                    packageName = it,
+                    icon = fileUtils.saveBitmap(
+                        it,
+                        apkInfoExtractor.getAppIconByPackageName(it).toBitmap()
+                    )
+                )
+            }
+
+            withContext(Dispatchers.Main) {
+                appsAdapter.addApps(apps)
+            }
+        }
     }
 
     private fun checkStoragePermission(): Any? {
